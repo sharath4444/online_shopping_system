@@ -15,3 +15,10 @@ This Java program simulates a basic online shopping system with the following ke
 6. **Exit**: Ends the program.
 
 The program's flow involves menu-based interaction, allowing users to navigate through login, product browsing, cart management, and checkout.
+
+
+
+![Screenshot 2024-08-18 001320](https://github.com/user-attachments/assets/fac09a7a-c5d3-4165-9814-e37d5e1906d6)
+
+
+![Screenshot 2024-08-18 001536](https://github.com/user-attachments/assets/8a55b4ee-9a14-4676-8456-492005cc8cfc)
