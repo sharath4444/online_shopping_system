@@ -1,6 +1,6 @@
 # online_shopping_system
 
-This Java program simulates a basic online shopping system with the following key features:
+This Java project simulates a basic online shopping system with the following key features:
 
 1. **User Login/Logout**: Users can log in with predefined credentials (`username: sharath`, `password: 1234`). Logged-in users can access additional features like adding items to the cart and checking out.
 
@@ -14,7 +14,7 @@ This Java program simulates a basic online shopping system with the following ke
 
 6. **Exit**: Ends the program.
 
-The program's flow involves menu-based interaction, allowing users to navigate through login, product browsing, cart management, and checkout.
+The project flow involves menu-based interaction, allowing users to navigate through login, product browsing, cart management, and checkout.
 
 
 
