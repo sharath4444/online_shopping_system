@@ -1,10 +1,14 @@
 package online_shoppin_system;
+
 import java.util.*;
-import java.lang.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class OnlineShoppingSystem {
     private static Scanner scanner = new Scanner(System.in);
     private static ShoppingCart cart = new ShoppingCart();
     private static User currentUser = null;
+    private static ExecutorService executor = Executors.newCachedThreadPool(); // Multithreading support
 
     public static void main(String[] args) {
         Product[] products = {
@@ -30,48 +34,55 @@ public class OnlineShoppingSystem {
             }
             System.out.println("6. Exit");
             System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
 
-            switch (choice) {
-                case 1:
-                    if (currentUser == null) {
-                        login();
-                    } else {
-                        logout();
-                    }
-                    break;
-                case 2:
-                    browseProducts(products);
-                    break;
-                case 3:
-                    if (currentUser != null) {
-                        addProductToCart(products);
-                    } else {
-                        System.out.println("Please login to add products to your cart.");
-                    }
-                    break;
-                case 4:
-                    if (currentUser != null) {
-                        viewCart();
-                    } else {
-                        System.out.println("Please login to view your cart.");
-                    }
-                    break;
-                case 5:
-                    if (currentUser != null) {
-                        checkout();
-                    } else {
-                        System.out.println("Please login to checkout.");
-                    }
-                    break;
-                case 6:
-                    exit = true;
-                    System.out.println("Thank you for shopping with us!");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-                    break;
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (choice) {
+                    case 1:
+                        if (currentUser == null) {
+                            login();
+                        } else {
+                            logout();
+                        }
+                        break;
+                    case 2:
+                        browseProducts(products);
+                        break;
+                    case 3:
+                        if (currentUser != null) {
+                            addProductToCart(products);
+                        } else {
+                            System.out.println("Please login to add products to your cart.");
+                        }
+                        break;
+                    case 4:
+                        if (currentUser != null) {
+                            viewCart();
+                        } else {
+                            System.out.println("Please login to view your cart.");
+                        }
+                        break;
+                    case 5:
+                        if (currentUser != null) {
+                            checkout();
+                        } else {
+                            System.out.println("Please login to checkout.");
+                        }
+                        break;
+                    case 6:
+                        exit = true;
+                        System.out.println("Thank you for shopping with us!");
+                        executor.shutdown(); 
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
             }
             System.out.println();
         }
@@ -83,11 +94,19 @@ public class OnlineShoppingSystem {
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        if ("sharath".equals(username) && "1234".equals(password)) {
+        try {
+            if (!"sharath".equals(username) || !"1234".equals(password)) {
+                throw new InvalidLoginException("Invalid username or password. Please try again.");
+            }
             currentUser = new User(username, password);
             System.out.println("Login successful.");
-        } else {
-            System.out.println("Invalid username or password. Please try again.");
+
+           
+            UserSession userSession = new UserSession(currentUser);
+            executor.execute(userSession);
+
+        } catch (InvalidLoginException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -106,22 +125,29 @@ public class OnlineShoppingSystem {
 
     private static void addProductToCart(Product[] products) {
         System.out.println("Enter the product ID to add to cart: ");
-        int productId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        try {
+            int productId = scanner.nextInt();
+            scanner.nextLine();
 
-        Product selectedProduct = null;
-        for (Product product : products) {
-            if (product.getId() == productId) {
-                selectedProduct = product;
-                break;
+            Product selectedProduct = null;
+            for (Product product : products) {
+                if (product.getId() == productId) {
+                    selectedProduct = product;
+                    break;
+                }
             }
-        }
 
-        if (selectedProduct != null) {
-            cart.addItem(selectedProduct);
-            System.out.println(selectedProduct.getName() + " has been added to your cart.");
-        } else {
-            System.out.println("Invalid product ID. Please try again.");
+            if (selectedProduct != null) {
+                cart.addItem(selectedProduct);
+                System.out.println(selectedProduct.getName() + " has been added to your cart.");
+            } else {
+                throw new InvalidInputException("Invalid product ID. Please try again.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input! Please enter a valid product ID.");
+            scanner.nextLine();
+        } catch (InvalidInputException e) {
+            System.out.println(e.getMessage());
         }
     }
 
